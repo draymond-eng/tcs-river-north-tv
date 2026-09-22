@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Three Cities Social · River North Calendar</title>
+  <style>
+    :root {
+      --bg: #0e0d0c;
+      --bg-elev: #171614;
+      --bg-cell: #1c1a18;
+      --bg-cell-mute: #141311;
+      --border: rgba(232, 220, 200, 0.08);
+      --border-strong: rgba(232, 220, 200, 0.16);
+      --cream: #e8dcc8;
+      --cream-dim: rgba(232, 220, 200, 0.55);
+      --cream-faint: rgba(232, 220, 200, 0.28);
+      --terracotta: #c4785a;
+      --terracotta-soft: #d49274;
+      --terracotta-glow: rgba(196, 120, 90, 0.35);
+      --today-bg: linear-gradient(160deg, rgba(196, 120, 90, 0.22), rgba(196, 120, 90, 0.08));
+      --text: #f3ebe0;
+      --muted: rgba(243, 235, 224, 0.45);
+      --danger: #a86b5c;
+      --radius: 10px;
+      --font: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+      --sans: "Avenir Next", "Segoe UI", system-ui, -apple-system, sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Hide scrollbars everywhere */
+    *::-webkit-scrollbar { width: 0; height: 0; display: none; }
+    * { scrollbar-width: none; -ms-overflow-style: none; }
+
+    body {
+      background:
+        radial-gradient(ellipse 90% 60% at 10% -10%, rgba(196, 120, 90, 0.09), transparent 50%),
+        radial-gradient(ellipse 70% 50% at 100% 100%, rgba(232, 220, 200, 0.04), transparent 45%),
+        var(--bg);
+    }
+
+    .app {
+      height: 100vh;
+      width: 100vw;
+      display: flex;
+      flex-direction: column;
+      padding: clamp(14px, 1.8vw, 28px) clamp(16px, 2vw, 36px) clamp(10px, 1.2vw, 18px);
+      gap: clamp(10px, 1.2vh, 18px);
+    }
+
+    /*: Main: welcome rail + calendar: */
+    .main {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: row;
+      gap: clamp(12px, 1.4vw, 22px);
+    }
+
+    .welcome-rail {
+      width: 27%;
+      min-width: 260px;
+      max-width: 500px;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: clamp(14px, 1.8vh, 24px);
+      padding: clamp(16px, 1.8vw, 28px) clamp(14px, 1.4vw, 22px);
+      background: var(--bg-elev);
+      border: 1px solid var(--border-strong);
+      border-radius: calc(var(--radius) + 4px);
+    }
+
+    .welcome-copy {
+      display: flex;
+      flex-direction: column;
+      gap: clamp(10px, 1.2vh, 16px);
+    }
+
+    .welcome-headline {
+      font-family: var(--font);
+      font-size: clamp(1.35rem, 2.2vw, 2.05rem);
+      font-weight: 600;
+      color: var(--cream);
+      line-height: 1.15;
+      letter-spacing: 0.01em;
+    }
+
+    .welcome-about {
+      display: flex;
+      flex-direction: column;
+      gap: clamp(8px, 1vh, 12px);
+      font-size: clamp(0.82rem, 1.1vw, 1.05rem);
+      line-height: 1.42;
+      color: var(--text);
+      font-weight: 450;
+    }
+
+    .welcome-about p {
+      margin: 0;
+    }
+
+    .welcome-about strong {
+      color: var(--cream);
+      font-weight: 560;
+    }
+
+    .welcome-about .addr-line {
+      color: var(--terracotta);
+      font-weight: 520;
+      letter-spacing: 0.02em;
+    }
+
+    /*: Rotating member quotes: */
+    .quotes {
+      position: relative;
+      flex: 1 1 auto;
+      min-height: clamp(110px, 16vh, 180px);
+      margin: clamp(4px, 0.6vh, 8px) 0;
+      padding: clamp(12px, 1.4vh, 18px) clamp(12px, 1.2vw, 16px);
+      background: rgba(232, 220, 200, 0.04);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    .quote {
+      position: absolute;
+      inset: clamp(12px, 1.4vh, 18px) clamp(12px, 1.2vw, 16px);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: clamp(8px, 1vh, 12px);
+      opacity: 0;
+      transition: opacity 1.25s ease;
+      pointer-events: none;
+    }
+
+    .quote.is-active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .quote-mark {
+      font-family: var(--font);
+      font-size: clamp(1.6rem, 2.4vw, 2.2rem);
+      line-height: 0.6;
+      color: var(--terracotta);
+      opacity: 0.85;
+    }
+
+    .quote-text {
+      font-family: var(--font);
+      font-size: clamp(0.95rem, 1.35vw, 1.28rem);
+      line-height: 1.35;
+      color: var(--cream);
+      font-weight: 500;
+      font-style: italic;
+    }
+
+    .quote-attr {
+      font-family: var(--sans);
+      font-size: clamp(0.68rem, 0.9vw, 0.82rem);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--terracotta-soft);
+      font-weight: 560;
+      font-style: normal;
+    }
+
+    .tour-block {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: clamp(8px, 1vh, 12px);
+      width: 100%;
+      margin-top: auto;
+      flex-shrink: 0;
+    }
+
+    .tour-qr {
+      width: min
