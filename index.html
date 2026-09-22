@@ -1,1 +1,29 @@
-LOADING_FROM_FILE
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Three Cities Social · River North Calendar</title>
+<style>html,body{margin:0;height:100%;background:#0e0d0c;color:#e8dcc8;font:14px system-ui,sans-serif}#boot{padding:24px}</style>
+</head>
+<body>
+<div id="boot">Loading River North calendar…</div>
+<script>
+(async () => {
+  const n = 5;
+  const parts = [];
+  for (let i = 0; i < n; i++) {
+    const res = await fetch('fragments/part' + i + '.txt', { cache: 'no-store' });
+    if (!res.ok) throw new Error('Missing fragment ' + i + ' (' + res.status + ')');
+    parts.push(await res.text());
+  }
+  const html = parts.join('');
+  document.open();
+  document.write(html);
+  document.close();
+})().catch((err) => {
+  document.getElementById('boot').textContent = 'Calendar failed to load: ' + err;
+});
+</script>
+</body>
+</html>
